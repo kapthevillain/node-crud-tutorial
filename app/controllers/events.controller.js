@@ -16,7 +16,8 @@ function showEvents(req, res) {
         // get all events
         Event.find({}, (err, events) =>{
             console.log(events);
-            res.render('pages/events', { events: events });
+            console.log(req.flash('success'));
+            res.render('pages/events', { events: events, message: req.flash('success') });
         });
         //return a view with data
 
@@ -75,6 +76,7 @@ function createEvent(req, res) {
         var createdEvent = new Event(req.body);
         createdEvent.save();
 
+        req.flash('success', 'Event was successfully added!');
         res.redirect('/events');
     };
 
