@@ -26,6 +26,7 @@ function showEvents(req, res) {
 // show a single events
 // ****
 function showSingle(req, res) {
+    console.log(' why here');
         // parse request url string to url object
         URL = url.parse(req.url);
         // split pathname to grab only the event slug
@@ -64,6 +65,18 @@ function seedEvents(req, res) {
 // create an event
 // ****
 function createEvent(req, res) {
+    console.log('here');
+    console.log(req.body);
+    if (req.method == 'GET'){
+        res.render('pages/create');
+    }
+
+    if (req.method == 'POST'){
+        var createdEvent = new Event(req.body);
+        createdEvent.save();
+
+        res.redirect('/events');
+    };
 
 }
 

@@ -14,15 +14,16 @@ router.get('/', mainController.showHome);
 //// event routes
 router.get('/events', eventsController.showEvents);
 
+// create events
+router.get('/events/create', eventsController.createEvent);
+router.post('/events/create', eventsController.createEvent);
 
 //seed events
 router.get('/events/seed', eventsController.seedEvents);
 
+
 // show single events
 router.get('/events/:slug', eventsController.showSingle);
-
-// create events
-router.post('/events/create', eventsController.createEvent);
 
 // edit events
 
