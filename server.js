@@ -13,6 +13,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
+const expressValidator = require('express-validator');
 
 // configure aws region
 AWS.config.loadFromPath('../config.json');
@@ -29,6 +30,7 @@ app.use(express.static(__dirname + "/public"));
 
 // middleware body parsing for dealing with creating events
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(expressValidator());
 
 //// set ejs as out templating engine
 app.set('view engine', 'ejs');

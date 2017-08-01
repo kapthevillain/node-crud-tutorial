@@ -5,7 +5,10 @@ module.exports = {
     showEvents: showEvents,
     showSingle: showSingle,
     seedEvents: seedEvents,
-    createEvent: createEvent
+    showCreate: showCreate,
+    processCreate: processCreate,
+    showEdit: showEdit,
+    process: processEdit
 
 }
 
@@ -15,27 +18,24 @@ module.exports = {
 function showEvents(req, res) {
         // get all events
         Event.find({}, (err, events) =>{
-            console.log(events);
-            console.log(req.flash('success'));
-            res.render('pages/events', { events: events, message: req.flash('success') });
+            if (err){
+                res.status(404);
+                res.send('Events not found!');
+            }
+            res.render('pages/events', { events: events });
         });
-        //return a view with data
-
 }
 
 // ****
 // show a single events
 // ****
 function showSingle(req, res) {
-    console.log(' why here');
-        // parse request url string to url object
-        URL = url.parse(req.url);
-        // split pathname to grab only the event slug
-        var eventslug = URL.pathname.split('/')[2];
-
-        Event.findOne({ slug: eventslug}, (err, event) =>{
+        Event.findOne({ slug: req.params.slug}, (err, event) =>{
+            if (err){
+                res.status(404);
+                res.send('Events not found!');
+            }
             res.render('pages/single', {event: event});
-            console.log(event.slug);
         });
 }
 
@@ -63,22 +63,53 @@ function seedEvents(req, res) {
 }
 
 // ****
+// show create page
+// ****
+function showCreate(
+    res.render('pages/create');
+)
+
+// ****
 // create an event
 // ****
-function createEvent(req, res) {
-    console.log('here');
-    console.log(req.body);
-    if (req.method == 'GET'){
-        res.render('pages/create');
-    }
+function processCreate(req, res) {
+   // if (req.method == 'GET'){
+     //   res.render('pages/create', { success: req.flash('success'), errors: req.flash('errors') });
+    //}
 
-    if (req.method == 'POST'){
-        var createdEvent = new Event(req.body);
-        createdEvent.save();
+    //if (req.method == 'POST'){
+        req.check('name', 'Event name required').notEmpty();
+        req.check('description', 'Event description required').notEmpty();
 
-        req.flash('success', 'Event was successfully added!');
-        res.redirect('/events');
-    };
+        req.getValidationResult().then(function(result){
+            if (result.isEmpty()){
+                var createdEvent = new Event(req.body);
+                createdEvent.save((err)=>{
+                    if(err)
+                        throw err;
+                });
+                req.flash('success', 'Event was successfully added!');
+            }
+            else {
+                var errors = result.array();
+                errors.forEach(function(error){req.flash('errors', error)});
+            }
+            res.redirect('/events/create');
 
+        });
+    //};
 }
 
+// ****
+// show event
+// ****
+function showEdit(req, res){
+    res.render('pages/edit');
+}
+
+// ****
+// edit event
+// ****
+function processEdit(){
+
+}

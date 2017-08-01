@@ -1,5 +1,23 @@
+<% if (success && success.length > 0) { %>
+         <div class="alert alert-success" role="alert"><%= success %></div>
+<% } %>
+<% if (errors && errors.length > 0) { %>
+     <div class="alert alert-danger text-left" role="alert">
+        <h3>Event not created!</h3>
+        <ul>
+             <% for (var error in errors) { %>
+                <li><%= errors[error].msg %></li>
+            <% } %>
+        </ul>
+    </div>
+<% } %>
 <div class="jumbotron text-center">
-    <h1>Create Event</h1>
+    <h1>Create an Event</h1>
+    <% console.log(success); %>
+    <% console.log(errors); %>
+    
+
+
     <form action="/events/create" method="POST">
 
         <div class="form-group">
