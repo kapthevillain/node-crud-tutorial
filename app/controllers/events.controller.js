@@ -8,7 +8,8 @@ module.exports = {
     showCreate: showCreate,
     processCreate: processCreate,
     showEdit: showEdit,
-    processEdit: processEdit
+    processEdit: processEdit,
+    deleteEvent: deleteEvent
 
 }
 
@@ -150,4 +151,17 @@ function processEdit(req, res){
             }
 
     });
+}
+
+// ****
+// delete event
+// ****
+function deleteEvent(req, res) {
+    Event.remove({ slug: req.params.slug }, (err) => {
+        //if (err)
+        //    throw err;
+
+        req.flash('success', 'Event deleted!');
+        res.redirect('/events');
+    })
 }
