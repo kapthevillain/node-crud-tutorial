@@ -1,0 +1,9 @@
+// Keep this file hidden from the public
+// Include in .gitignore file
+
+{
+	"accessKeyId": "AWS access key ID",
+	"secretAccessKey":  "AWS secret access key",
+	"region": "AWS Region"
+}
+

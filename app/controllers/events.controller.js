@@ -8,7 +8,7 @@ module.exports = {
     showCreate: showCreate,
     processCreate: processCreate,
     showEdit: showEdit,
-    process: processEdit
+    processEdit: processEdit
 
 }
 
@@ -22,7 +22,7 @@ function showEvents(req, res) {
                 res.status(404);
                 res.send('Events not found!');
             }
-            res.render('pages/events', { events: events });
+            res.render('pages/events', { events: events, success: req.flash('success') });
         });
 }
 
@@ -35,7 +35,10 @@ function showSingle(req, res) {
                 res.status(404);
                 res.send('Events not found!');
             }
-            res.render('pages/single', {event: event});
+            res.render('pages/single', {
+                event: event,
+                success: req.flash('success')
+            });
         });
 }
 
@@ -65,51 +68,86 @@ function seedEvents(req, res) {
 // ****
 // show create page
 // ****
-function showCreate(
-    res.render('pages/create');
-)
+function showCreate(req, res){
+    res.render('pages/create', { errors: req.flash('errors') });
+}
 
 // ****
 // create an event
 // ****
 function processCreate(req, res) {
-   // if (req.method == 'GET'){
-     //   res.render('pages/create', { success: req.flash('success'), errors: req.flash('errors') });
-    //}
+    req.check('name', 'Event name required').notEmpty();
+    req.check('description', 'Event description required').notEmpty();
 
-    //if (req.method == 'POST'){
-        req.check('name', 'Event name required').notEmpty();
-        req.check('description', 'Event description required').notEmpty();
-
-        req.getValidationResult().then(function(result){
+    req.getValidationResult().then(function(result){
             if (result.isEmpty()){
-                var createdEvent = new Event(req.body);
-                createdEvent.save((err)=>{
+                var event = new Event({
+                    name: req.body.name,
+                    description: req.body.description
+                });
+
+                event.save((err)=>{
                     if(err)
                         throw err;
+
+                    // success message
+                    req.flash('success', 'Event was successfully added!');
+                    // redirect to newly created page
+                    res.redirect(`/events/${event.slug}`);
                 });
-                req.flash('success', 'Event was successfully added!');
             }
             else {
                 var errors = result.array();
+                console.log(errors);
                 errors.forEach(function(error){req.flash('errors', error)});
+                return res.redirect('/events/create');
             }
-            res.redirect('/events/create');
 
         });
-    //};
 }
 
 // ****
 // show event
 // ****
 function showEdit(req, res){
-    res.render('pages/edit');
+    Event.findOne({ slug: req.params.slug }, (err, event) => {
+        res.render('pages/edit', {event: event, errors: req.flash('errors') });
+    })
 }
 
 // ****
 // edit event
 // ****
-function processEdit(){
+function processEdit(req, res){
+    req.check('name', 'Event name required').notEmpty();
+    req.check('description', 'Event description required').notEmpty();
 
+    req.getValidationResult().then(function(result){
+        if (result.isEmpty()){
+            Event.findOne({ slug: req.params.slug }, (err, event) =>{
+                // update event
+                event.name = req.body.name;
+                event.description = req.body.description;
+
+                // save event
+                event.save((err)=>{
+                    if(err)
+                        throw err;
+
+                    // success message
+                    req.flash('success', 'Event was successfully updated!');
+                    // redirect to newly created page
+                    res.redirect('/events');
+
+                });
+            });
+        }
+        else {
+            var errors = result.array();
+            console.log(errors);
+            errors.forEach(function(error){req.flash('errors', error)});
+                return res.redirect(`/events/${req.params.slug}/edit`);
+            }
+
+    });
 }

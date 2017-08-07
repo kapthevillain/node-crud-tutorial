@@ -16,7 +16,7 @@ const flash = require('connect-flash');
 const expressValidator = require('express-validator');
 
 // configure aws region
-AWS.config.loadFromPath('../config.json');
+AWS.config.loadFromPath('./config.json');
 AWS.config.update({region:'us-west-2'});
 
 // load modules
